@@ -1,0 +1,72 @@
+---
+title: "01_Reading_in_spatial_data"
+author: "Reed Kenny"
+date: "2023-05-31"
+output: html_document
+---
+
+# Reading in Spatial Data
+
+In this workshop we will look at dowloading species occurence data and plotting it with US forest service administrative boundary layers. 
+
+We will first download some points from the [Global Biodiveristy Information Facitlity](gbif.org). We will use the package rgbif to access the api. 
+
+```{r} 
+
+library(rgbif)
+
+J.saximontanus <- occ_search(scientificName = "Juncus saximontanus", hasCoordinate = TRUE)
+
+J.sax.points <- J.saximontanus$data %>% select("scientificName", "occurrenceRemarks", "locality", "associatedTaxa", "habitat", "recordedBy", "eventDate", "decimalLongitude", "decimalLatitude")
+```
+
+Since gbif includes many columns of data in the download I have gone ahead and only selected those that may be relevant. 
+
+The next thing we can do is to use the sf (simple features) package to convert the columns of latitude and longitude data from GBIF into something that R will recognize as spatial data. 
+
+```{r} 
+library(sf)
+
+J.sax.points <- J.sax.points %>% st_as_sf(coords = c("decimalLongitude","decimalLatitude"), crs = "+proj=longlat +datum=WGS84 +ellps=WGS84")
+
+```
+
+Notice here that I had to tell sf which columns are longitude and latitude, (the format is x, y) and I had to specify a CRS (coordinate reference system). When in doubt, most data generated after about 1990 is likley using the WGS 84 system, it's what all GPS units use.
+
+Next we can use the really nifty package mapview, to quickly look at what we downloaded and make sure it makes sense. 
+
+```{r}
+
+library(mapview)
+
+mapview(J.sax.points)
+
+```
+
+Ok that looks good so now I can pull in a few other layers. I am interested in California occurences of this species, as well as eventually making a map with the California border. So I want to get the California outline on a map. The tigris package is really good for US administrative boundaries as well as a ton of other things like census tract data. For now lets just use it to get the California border. 
+
+```{r} 
+
+library(tigris)
+
+CA <- states() %>% filter(NAME =="California")
+
+```
+
+That was easy, now lets see if it worked
+
+
+
+```{r}
+
+mapview(CA)
+
+```
+
+Next I want to download the US national forest boundaries as well as ranger district boundaries. 
+
+These I will have to pull from the [USFS website](https://data.fs.usda.gov/geodata/edw/datasets.php?dsetCategory=boundaries)
+
+
+
+
