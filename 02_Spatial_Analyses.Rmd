@@ -1,0 +1,79 @@
+---
+title: "02_Spatial_analyses"
+author: "Reed Kenny"
+date: "2023-06-01"
+output: html_document
+---
+
+# Spatial Analyses
+
+Awesome! We have a bunch of spatial data layers now, we can do cool stuff with them right ...?
+
+```{r eval = FALSE} 
+
+library(sf)
+
+J.sax.cal <- st_intersection(J.sax.points, CA)
+
+```
+
+Oooops! Looks like our CRS systems are not matching, so we need to transform one. Let's use WGS for everything. I'm just going to copy/paste my CRS definition that I used for the GBIF data. 
+
+```{r eval = FALSE} 
+
+CA <- st_transform(CA, crs = "+proj=longlat +datum=WGS84 +ellps=WGS84")
+
+```
+Ok lets try again
+
+```{r eval = FALSE}
+library(mapview)
+
+J.sax.cal <- st_intersection(J.sax.points, CA)
+
+mapview(J.sax.cal)
+
+```
+Great, that worked. Now lets also get only the forest boundaries and ranger districts in California. 
+
+```{r eval = FALSE}
+
+US_forests <- US_forests %>% st_transform(crs = "+proj=longlat +datum=WGS84 +ellps=WGS84")
+
+districts <- districts %>% st_transform(crs = "+proj=longlat +datum=WGS84 +ellps=WGS84")
+
+Cal_forests <- st_intersection(US_forests, CA)
+
+```
+Dang! We were being so careful... looks like a geometry error. This is saying that two polygons are sharing a vertex which is does not like. We can try the function st_make_valid, which checks the geometry and will correct situations like this (*hopefully*)
+
+```{r eval = FALSE}
+
+US_forests <- st_make_valid(US_forests)
+
+districts <- st_make_valid(districts)
+
+```
+
+Ok lets try again
+
+```{r eval = FALSE}
+
+Cal_forests <- st_intersection(US_forests, CA)
+
+Cal_districts <- st_intersection(districts, CA)
+
+
+
+```
+
+Great, the last analysis thing I want to do is to add the ranger district information to my Juncus points. You could do this with a left join but then I think you would end up with multiple columns of spatial data and it might not work. 
+
+```{r eval = FALSE}
+
+J.sax.cal <- st_join(J.sax.cal, Cal_districts)
+
+View(J.sax.cal)
+
+```
+

@@ -1,0 +1,67 @@
+---
+title: "03_mapping"
+author: "Reed Kenny"
+date: "2023-06-01"
+output: html_document
+---
+
+# Mapping
+
+Ok lets put these all together in a map
+
+```{r eval = FALSE}
+
+library(tmap)
+
+#tmap_mode("view")
+tmap_mode("plot")
+tm_basemap("OpenTopoMap") +
+tm_shape(CA, bbox = "San Bernardino National Forest") +
+  tm_borders("black", lwd = .5) +
+tm_shape(Cal_forests) +
+  tm_polygons(col = "FORESTNAME", palette = "Blues",
+              title = "National Forest") +
+tm_shape(Cal_districts) +
+  tm_borders("white", lwd = .5) +
+  tm_shape(J.sax.cal) +
+  tm_dots(col = "red") +
+  tm_scale_bar(breaks = c(0, 1, 2), text.size = 1, position = c("left", "bottom")) +
+  tm_compass(type = "4star", position = c("left", "bottom"))  +
+  tm_layout(main.title = "Juncus saximontanus sites California", 
+            main.title.size = 1.25, main.title.position="center",
+            legend.outside = TRUE, legend.outside.position = "right",
+            frame = FALSE, legend.width = 3)
+
+```
+
+Thats pretty rad, what if we just want to zoom in on part of the map? We have a few options with tmap. The extend of the map matched the extect of the first layer that you add, so we can make a new layer if we want that corresponds to our area of interest. 
+
+Let's say we want to zoom in on the Big Bear region. 
+
+
+
+```{r eval = FALSE}
+
+Bigbear <- Cal_districts %>% filter(ADMINFORES == "99051200010343")
+
+tmap_mode("view")
+tm_basemap("OpenTopoMap") +
+  tm_shape(Bigbear) +
+  tm_borders("black") +
+tm_shape(J.sax.cal) +
+  tm_dots(col = "red")
+  
+
+```
+
+Ok not that bad, but I'd rather be centered on the cluster of points. You can manually set the bounding box to achieve this
+
+```{r eval = FALSE}
+tmap_mode("view")
+tm_basemap("OpenTopoMap") +
+  tm_shape(Cal_districts, bbox = c(-117.60450, 33.96786, -116.63543, 34.41352)) +
+  tm_borders("black") +
+tm_shape(J.sax.cal) +
+  tm_dots(col = "red")
+
+```
