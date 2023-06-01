@@ -7,6 +7,7 @@ output: html_document
 
 # Reading in Spatial Data
 
+
 In this workshop we will look at dowloading species occurence data and plotting it with US forest service administrative boundary layers. 
 
 We will first download some points from the [Global Biodiveristy Information Facitlity](gbif.org). We will use the package rgbif to access the api. 

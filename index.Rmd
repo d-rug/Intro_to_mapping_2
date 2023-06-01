@@ -29,4 +29,8 @@ output:
 
 # Overview {-}
 
-YOUR DESCRIPTION, LEARNING GOALS, PREREQUISITES, ETC
+We will go through a fairly simple workflow with spatial data, reading in points and polygons then clipping them to a specific extent and appending some data from one to the other. Then we will map them all together. 
+
+Packages used in this workshop. 
+
+rgbif, sf, mapview, tmap
